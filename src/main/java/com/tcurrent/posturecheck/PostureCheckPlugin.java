@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.posturecheck;
+package com.tcurrent.posturecheck;
 
 import java.time.Duration;
 import java.time.Instant;
