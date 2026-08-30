@@ -16,7 +16,7 @@ public interface PostureCheckConfig extends Config
     @ConfigItem(
         keyName = "reminderIntervalMinutes",
         name = "Interval (min)",
-        description = "How often to remind you to fix your posture",
+        description = "How often to remind you to fix your posture (in minutes)",
         position = 1
     )
     default int reminderIntervalMinutes()

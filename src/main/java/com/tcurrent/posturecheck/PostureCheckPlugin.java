@@ -10,6 +10,7 @@ import com.google.inject.Provides;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
@@ -25,6 +26,8 @@ import net.runelite.client.plugins.PluginDescriptor;
 )
 public class PostureCheckPlugin extends Plugin
 {
+    private static final Duration PAUSE_GRACE_PERIOD = Duration.ofMinutes(5);
+
     @Inject
     private Client client;
 
@@ -34,7 +37,9 @@ public class PostureCheckPlugin extends Plugin
     @Inject
     private Notifier notifier;
 
-    private Instant lastReminder = Instant.now();
+    private Duration activeTimeSinceReminder = Duration.ZERO;
+    private Instant activeSince;
+    private Instant pausedSince;
 
     @Provides
     PostureCheckConfig provideConfig(ConfigManager configManager)
@@ -45,7 +50,22 @@ public class PostureCheckPlugin extends Plugin
     @Override
     protected void startUp()
     {
-        lastReminder = Instant.now();
+        activeTimeSinceReminder = Duration.ZERO;
+        activeSince = client.getGameState() == GameState.LOGGED_IN ? Instant.now() : null;
+        pausedSince = null;
+    }
+
+    @Subscribe
+    public void onGameStateChanged(GameStateChanged event)
+    {
+        Instant now = Instant.now();
+        if (event.getGameState() == GameState.LOGGED_IN)
+        {
+            resumeReminderTimer(now);
+            return;
+        }
+
+        pauseReminderTimer(now);
     }
 
     @Subscribe
@@ -56,14 +76,46 @@ public class PostureCheckPlugin extends Plugin
             return;
         }
 
-        long intervalMs = Duration.ofMinutes(config.reminderIntervalMinutes()).toMillis();
-        if (Duration.between(lastReminder, Instant.now()).toMillis() < intervalMs)
+        Instant now = Instant.now();
+        resumeReminderTimer(now);
+        Duration interval = Duration.ofMinutes(config.reminderIntervalMinutes());
+        Duration activeTime = activeTimeSinceReminder.plus(Duration.between(activeSince, now));
+        if (activeTime.compareTo(interval) < 0)
         {
             return;
         }
 
         triggerReminder();
-        lastReminder = Instant.now();
+        activeTimeSinceReminder = Duration.ZERO;
+        activeSince = now;
+    }
+
+    private void pauseReminderTimer(Instant now)
+    {
+        if (activeSince == null)
+        {
+            return;
+        }
+
+        activeTimeSinceReminder = activeTimeSinceReminder.plus(Duration.between(activeSince, now));
+        activeSince = null;
+        pausedSince = now;
+    }
+
+    private void resumeReminderTimer(Instant now)
+    {
+        if (activeSince != null)
+        {
+            return;
+        }
+
+        if (pausedSince != null && Duration.between(pausedSince, now).compareTo(PAUSE_GRACE_PERIOD) >= 0)
+        {
+            activeTimeSinceReminder = Duration.ZERO;
+        }
+
+        activeSince = now;
+        pausedSince = null;
     }
 
     private void triggerReminder()
