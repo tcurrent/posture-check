@@ -70,7 +70,7 @@ public class PostureCheckPlugin extends Plugin
     {
         if (config.chatMessageEnabled())
         {
-            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", config.reminderText(), null);
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", String.format("<col=%06x>[Posture Check]</col> <col=%06x>%s</col>", config.prefixColor().getRGB() & 0xFFFFFF, config.messageColor().getRGB() & 0xFFFFFF, config.reminderText()), null);
         }
 
         if (!config.notificationEnabled())
@@ -78,6 +78,6 @@ public class PostureCheckPlugin extends Plugin
             return;
         }
 
-        notifier.notify(config.reminderText());
+        notifier.notify("[Posture Check] " + config.reminderText());
     }
 }
