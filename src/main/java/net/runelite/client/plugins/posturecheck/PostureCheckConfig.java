@@ -21,7 +21,7 @@ public interface PostureCheckConfig extends Config
     )
     default int reminderIntervalMinutes()
     {
-        return 30;
+        return 60;
     }
 
     @ConfigItem(
