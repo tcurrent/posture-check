@@ -4,7 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup(PostureCheckConfig.GROUP)
+@ConfigGroup("posturecheck")
 public interface PostureCheckConfig extends Config
 {
     String GROUP = "posturecheck";

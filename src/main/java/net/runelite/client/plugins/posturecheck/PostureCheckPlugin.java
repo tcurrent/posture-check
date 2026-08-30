@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.posturecheck;
 
+import com.google.inject.Provides;
 import java.time.Duration;
 import java.time.Instant;
 import javax.inject.Inject;
@@ -7,6 +8,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.Notifier;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -29,6 +31,12 @@ public class PostureCheckPlugin extends Plugin
     private Notifier notifier;
 
     private Instant lastReminder = Instant.now();
+
+    @Provides
+    PostureCheckConfig provideConfig(ConfigManager configManager)
+    {
+        return configManager.getConfig(PostureCheckConfig.class);
+    }
 
     @Override
     protected void startUp()
