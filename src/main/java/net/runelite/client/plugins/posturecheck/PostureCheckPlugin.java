@@ -1,9 +1,13 @@
 package net.runelite.client.plugins.posturecheck;
 
-import com.google.inject.Provides;
 import java.time.Duration;
 import java.time.Instant;
+
 import javax.inject.Inject;
+
+import com.google.inject.Provides;
+
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameTick;
@@ -64,6 +68,11 @@ public class PostureCheckPlugin extends Plugin
 
     private void triggerReminder()
     {
+        if (config.chatMessageEnabled())
+        {
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", config.reminderText(), null);
+        }
+
         if (!config.notificationEnabled())
         {
             return;
