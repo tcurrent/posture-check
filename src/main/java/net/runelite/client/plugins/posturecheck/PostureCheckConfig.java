@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.posturecheck;
 
+import java.awt.Color;
+
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -13,7 +15,7 @@ public interface PostureCheckConfig extends Config
     @Range(min = 1)
     @ConfigItem(
         keyName = "reminderIntervalMinutes",
-        name = "Reminder interval (minutes)",
+        name = "Interval (min)",
         description = "How often to remind you to fix your posture",
         position = 1
     )
@@ -30,7 +32,7 @@ public interface PostureCheckConfig extends Config
     )
     default String reminderText()
     {
-        return "Posture check: sit upright, relax your shoulders, and keep your feet flat.";
+        return "Sit upright, relax your shoulders, and keep your feet flat.";
     }
 
     @ConfigItem(
@@ -53,5 +55,27 @@ public interface PostureCheckConfig extends Config
     default boolean chatMessageEnabled()
     {
         return true;
+    }
+
+    @ConfigItem(
+        keyName = "prefixColor",
+        name = "Prefix color",
+        description = "Color for the Posture Check chat prefix",
+        position = 5
+    )
+    default Color prefixColor()
+    {
+        return new Color(255, 152, 31);
+    }
+
+    @ConfigItem(
+        keyName = "messageColor",
+        name = "Message color",
+        description = "Color for the reminder text in the in-game chat window",
+        position = 6
+    )
+    default Color messageColor()
+    {
+        return Color.WHITE;
     }
 }
